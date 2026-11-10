@@ -12,6 +12,9 @@ export default function Hero() {
   const [countryCode, setCountryCode] = useState("+51");
   const [showCodeDropdown, setShowCodeDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const formCardRef = useRef<HTMLDivElement>(null);
+  const [carouselHeight, setCarouselHeight] = useState<number | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleScrollToVideo = () => {
@@ -97,6 +100,46 @@ export default function Hero() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Ajuste en mobile para que el carrusel se extienda solo hasta donde comienza el formulario
+  useEffect(() => {
+    const updateCarouselHeight = () => {
+      if (typeof window !== "undefined" && window.innerWidth < 1024) {
+        if (formCardRef.current && heroSectionRef.current) {
+          const formRect = formCardRef.current.getBoundingClientRect();
+          const heroRect = heroSectionRef.current.getBoundingClientRect();
+          const height = formRect.top - heroRect.top;
+          if (height > 50) {
+            setCarouselHeight(Math.round(height));
+          }
+        }
+      } else {
+        setCarouselHeight(null);
+      }
+    };
+
+    updateCarouselHeight();
+
+    const timer = setTimeout(updateCarouselHeight, 150);
+    window.addEventListener("resize", updateCarouselHeight);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && heroSectionRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        updateCarouselHeight();
+      });
+      resizeObserver.observe(heroSectionRef.current);
+      if (formCardRef.current) {
+        resizeObserver.observe(formCardRef.current);
+      }
+    }
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateCarouselHeight);
+      resizeObserver?.disconnect();
+    };
+  }, []);
+
   const getCountryEmoji = (code: string) => {
     const trimmed = code.trim();
     if (!trimmed) return "🌐";
@@ -161,10 +204,16 @@ export default function Hero() {
   return (
     <section
       id="inicio"
+      ref={heroSectionRef}
       className="relative pt-[70px] pb-6 lg:pt-[82px] lg:pb-8 flex items-center bg-black text-white overflow-hidden"
     >
       {/* Carrusel de imágenes de la portada */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      <div
+        style={{
+          height: carouselHeight ? `${carouselHeight}px` : undefined,
+        }}
+        className="absolute top-0 left-0 right-0 z-0 overflow-hidden lg:inset-0 lg:!h-full"
+      >
         {heroSlides.map((slide, idx) => (
           <div
             key={slide.url}
@@ -179,8 +228,8 @@ export default function Hero() {
             />
           </div>
         ))}
-        {/* Capa negra transparente para apreciar claramente las unidades manteniendo alta legibilidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/35 lg:bg-gradient-to-r lg:from-black/75 lg:via-black/45 lg:to-black/25 z-[2]" />
+        {/* Capa de degradado: en mobile tiene un degradado a negro puro (#000000) antes del formulario para fundirse de forma perfecta con el fondo negro del formulario, y en desktop degradado lateral */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 via-50% to-[#000000] lg:bg-gradient-to-r lg:from-black/75 lg:via-black/45 lg:to-black/25 z-[2]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -230,7 +279,7 @@ export default function Hero() {
 
           {/* Lado Derecho: Formulario Hero "CONSULTA TU SERVICIO" - bajado para separarse del menú y con altura más compacta */}
           <div className="lg:col-span-5 w-full max-w-md mx-auto lg:ml-auto pt-3 sm:pt-4 lg:pt-6">
-            <div className="bg-white text-gray-900 rounded-2xl p-4 sm:p-5 shadow-2xl border border-gray-150 relative overflow-hidden">
+            <div ref={formCardRef} className="bg-white text-gray-900 rounded-2xl p-4 sm:p-5 shadow-2xl border border-gray-150 relative overflow-hidden">
               
               {isSuccess && (
                 <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-5 text-center">
@@ -249,7 +298,7 @@ export default function Hero() {
                   CONSULTA TU SERVICIO
                 </h3>
                 <p className="text-[11px] font-sans text-gray-500 mt-0.5">
-                  Completa los datos y te atendemos de inmediato
+                  Completa tus datos y cuéntanos qué servicio necesitas
                 </p>
               </div>
 
@@ -413,7 +462,7 @@ export default function Hero() {
                     ENVIAR CONSULTA
                   </button>
                   <p className="text-[10px] text-gray-500 font-sans text-center mt-1.5">
-                    Respuesta rápida y directa a tu WhatsApp
+                    Te contactaremos directamente por WhatsApp · Reservas Lun–Sáb 8:00–18:00
                   </p>
                 </div>
               </form>
