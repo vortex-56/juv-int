@@ -195,20 +195,20 @@ export default function WhoTrustsUs() {
           <button
             type="button"
             onClick={prev}
-            aria-label="Ver anteriores"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 bg-white rounded-full shadow-md border border-gray-200 text-[#7b1824] hover:bg-[#7b1824] hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
+            aria-label="Ver anteriores entidades"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-md border border-gray-200 text-[#7b1824] hover:bg-[#7b1824] hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
           </button>
 
           {/* Flecha Derecha */}
           <button
             type="button"
             onClick={next}
-            aria-label="Ver siguientes"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 bg-white rounded-full shadow-md border border-gray-200 text-[#7b1824] hover:bg-[#7b1824] hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
+            aria-label="Ver siguientes entidades"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-md border border-gray-200 text-[#7b1824] hover:bg-[#7b1824] hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5" aria-hidden="true" />
           </button>
 
           {/* Ventana de visualización */}
